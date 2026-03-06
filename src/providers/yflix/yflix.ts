@@ -7,7 +7,7 @@ export class yFlix {
     fetcher(url);
   }
 
-  static async search(query: string) {
+  static async search(_query: string) {
     return "GARBAGE";
   }
 }
