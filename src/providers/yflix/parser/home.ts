@@ -4,8 +4,7 @@ import type { ContentFeatured, ContentTop10Card, Genre, MovieCard, TvCard } from
 
 type Slider = {
     name: string,
-    movies: MovieCard[],
-    tvs: TvCard[]
+    items: (MovieCard | TvCard)[]
 }
 type HomeData = {
     featured: ContentFeatured[],
@@ -119,7 +118,7 @@ export function extractHomeData(html: string): HomeData {
 
                 if (!id || !year) return;
 
-                recommended_movies.push({ id, title, year: +year, runtime, quality });
+                recommended_movies.push({ id, type: "movie", title, year: +year, runtime, quality });
             })
 
         } else {
@@ -139,11 +138,40 @@ export function extractHomeData(html: string): HomeData {
 
                 if (!id || !season_count || !latest_episode) return;
 
-                recommended_tvs.push({ id, title, season_count, latest_episode, quality });
+                recommended_tvs.push({ id, type: "tv", title, season_count, latest_episode, quality });
             })
         }
 
     });
+
+
+    $("main section.slider").each((_, sli) => {
+
+        const name = $(sli).find(".section-title").text();
+        const sliderItems: (MovieCard | TvCard)[] = []
+
+        $(sli).find(".swiper-slide").each((_, item) => {
+            const url = $(item).find("a.title").attr("href");
+
+            if (!url) return;
+
+            const id = url.split("/").reverse()[0];
+            const title = $(item).find("a.title").text();
+            const quality = $(item).find(".quality").text();
+
+            const [type, string2, string3] = $(item).find(".metadata span").map((_, el) => $(el).text()).get();
+
+            if (!id || !type || !string2 || !string2) return;
+
+            if (type == "Movie") {
+                sliderItems.push({ id, type: "movie", title, year: +string2, runtime: string3, quality });
+            } else {
+                sliderItems.push({ id, type: "tv", title, season_count: +string2.replace(/[^0-9]/g, ""), latest_episode: +string2.replace(/[^0-9]/g, ""), quality });
+            }
+        })
+
+        sliders.push({ name, items: sliderItems })
+    })
 
     return {
         featured,

@@ -9,8 +9,7 @@ export class yFlix {
     const data = await fetcher(url, true);
     if (!data || !data.text) return;
 
-    const result = extractHomeData(data.text);
-    return result;
+    return extractHomeData(data.text);
   }
 
   static async search(query: string) {

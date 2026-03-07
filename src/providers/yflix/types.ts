@@ -145,6 +145,7 @@ export type ContentFeatured = {
 
 export type MovieCard = {
   id: string;
+  type: "movie";
   title: string;
   year: number;
   runtime?: string;
@@ -153,6 +154,7 @@ export type MovieCard = {
 
 export type TvCard = {
   id: string;
+  type: "tv";
   title: string;
   season_count: number;
   latest_episode: number;

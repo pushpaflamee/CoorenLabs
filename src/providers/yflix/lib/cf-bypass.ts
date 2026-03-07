@@ -19,42 +19,39 @@ interface ClearanceResult {
   error?: string;
 }
 
-const TIMEOUT = 30_000; 
+const TIMEOUT = 15_000; 
 
-// Global singletons to keep the browser warm
+// Simple global variables to hold the warm browser and page
 let browserInstance: any = null;
-let persistentPage: any = null;
-
-async function initBrowser(): Promise<void> {
-  // Failsafe: kill any hanging instances before launching a new one
-  if (browserInstance) {
-    await browserInstance.close().catch(() => {});
-  }
-
-  Logger.info("Cold start: Launching persistent anti-detect browser...");
-  const { browser, page } = await connect({
-    headless: false,       
-    turnstile: true,       // Hooked directly to this specific 'page'
-    disableXvfb: false,    
-    ignoreAllFlags: false  
-  });
-
-  browserInstance = browser;
-  persistentPage = page;
-}
+let pageInstance: any = null;
 
 export async function getCloudflareClearance(targetUrl: string): Promise<ClearanceResult> {
-  // If the browser hasn't been launched yet, or if the page crashed/closed, restart it
-  if (!browserInstance || !persistentPage || persistentPage.isClosed()) {
-    await initBrowser();
-  }
-
   try {
-    Logger.info(`Navigating to ${targetUrl} using warm browser...`);
-    await persistentPage.goto(targetUrl, { waitUntil: 'domcontentloaded' });
+    // 1. Cold start ONLY if the browser/page doesn't exist or somehow crashed
+    if (!browserInstance || !pageInstance || pageInstance.isClosed()) {
+      Logger.info("Cold start: Launching persistent browser...");
+      
+      // Cleanup just in case there's a zombie process
+      if (browserInstance) await browserInstance.close().catch(() => {});
+      
+      const { browser, page } = await connect({
+        headless: false,       
+        turnstile: true,       
+        disableXvfb: false,    
+        ignoreAllFlags: false  
+      });
+      
+      browserInstance = browser;
+      pageInstance = page;
+    }
+
+    // 2. Just use the warm page to navigate directly
+    Logger.info(`Navigating to ${targetUrl}...`);
+    await pageInstance.goto(targetUrl, { waitUntil: 'domcontentloaded' });
 
     Logger.info("Polling every 500ms for the cf_clearance cookie...");
     
+    // 3. Extract the cookie and TTL
     const extractionData = await new Promise<{ cookies: any[], cfClearance: string, userAgent: string, ttl: number }>((resolve, reject) => {
       let checkInterval: NodeJS.Timeout;
       
@@ -65,9 +62,9 @@ export async function getCloudflareClearance(targetUrl: string): Promise<Clearan
 
       checkInterval = setInterval(async () => {
         try {
-          if (persistentPage.isClosed()) return;
+          if (pageInstance.isClosed()) return;
           
-          const cookies = await persistentPage.cookies();
+          const cookies = await pageInstance.cookies();
           const cfCookie = cookies.find((c: any) => c.name === 'cf_clearance');
           
           if (cfCookie) {
@@ -81,7 +78,7 @@ export async function getCloudflareClearance(targetUrl: string): Promise<Clearan
               if (ttlSeconds <= 0) ttlSeconds = 3600; 
             }
             
-            const userAgent = await persistentPage.evaluate((): string => navigator.userAgent);
+            const userAgent = await pageInstance.evaluate((): string => navigator.userAgent);
             
             resolve({ 
               cookies, 
@@ -91,15 +88,15 @@ export async function getCloudflareClearance(targetUrl: string): Promise<Clearan
             });
           }
         } catch (err) {
-          // Suppress context errors that happen during rapid page reloads
+          // Suppress rapid-reload context errors
         }
       }, 500);
     });
 
-    Logger.info(`Got the cookie! TTL is ${extractionData.ttl} seconds. Parking the browser...`);
+    Logger.info(`Got the cookie! TTL is ${extractionData.ttl} seconds. Leaving browser idle.`);
 
-    // Park the browser on a blank page immediately to free up CPU/Memory from the target site's JS
-    persistentPage.goto('about:blank').catch(() => {});
+    // NO FINALLY BLOCK. We don't close the tab or change the URL. 
+    // We just leave it exactly as-is so it's perfectly ready for the next run.
 
     return {
       success: true,
@@ -112,12 +109,6 @@ export async function getCloudflareClearance(targetUrl: string): Promise<Clearan
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     console.error("Failed to bypass:", errorMessage);
-    
-    // If we hit a critical error, park the browser just in case
-    if (persistentPage && !persistentPage.isClosed()) {
-      persistentPage.goto('about:blank').catch(() => {});
-    }
-    
     return { success: false, error: errorMessage };
   }
 }
