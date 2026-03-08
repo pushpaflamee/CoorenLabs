@@ -15,7 +15,6 @@ import { proxyRoutes } from "./core/proxyRoutes";
 import { animeRoutes } from "./providers/anime/route";
 import { mangaRoutes } from "./providers/manga/route";
 import { yFlixRoutes } from "./providers/yflix/route";
-import { mangaRoutes } from "./providers/manga/route";
 import { tidalRoutes } from "./providers/tidal/route";
 
 validateConfig();
@@ -75,7 +74,7 @@ app
   .use(tidalRoutes)
   .use(proxyRoutes)
   .get("/tidal-demo", () => Bun.file("tests/tidal_demo.html"))
-  .onError(({ code, error, set }: { code: string, error: Error, set: any }) => {
+  .onError(({ code, error, set }: any) => {
     if (code === 'NOT_FOUND') {
       set.status = 404;
       return { status: 404, success: false, message: "Route not found", data: null };
