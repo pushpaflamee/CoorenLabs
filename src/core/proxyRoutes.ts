@@ -3,14 +3,13 @@ import { SERVER_ORIGIN } from "./config";
 import { isTooLarge } from "./helper";
 import { Logger } from "./logger";
 
-
 // for proxy safety
 const MAX_M3U8_SIZE = 5 * 1024 * 1024;       // 5 MB
 const MAX_TS_SIZE = 50 * 1024 * 1024;        // 50 MB
 const MAX_FETCH_SIZE = 50 * 1024 * 1024;     // 50 MB
-const MAX_MP4_SIZE = 10 * 1024 * 1024 * 1024; // 10 GB
+const MAX_MP4_SIZE = 20 * 1024 * 1024 * 1024; // 20 GB
 
-
+const PLAYLIST_REGEX = /\.m3u|playlist|\.txt/i
 
 if (!SERVER_ORIGIN) throw new Error("set SERVER_ORIGIN at .env!");
 
@@ -26,7 +25,13 @@ export const proxyRoutes = new Elysia({ prefix: "/proxy" })
         "/proxy/mp4-proxy?url={url}&headers="
       ]
     }
+  }, {
+    detail: { 
+      tags: ['proxy'], 
+      summary: 'Proxy API Overview' 
+    }
   })
+
   .get("/m3u8-proxy", async ({ request, query: { url, headers } }) => {
     let corsHeaders: Record<string, string> = {};
 
@@ -69,7 +74,7 @@ export const proxyRoutes = new Elysia({ prefix: "/proxy" })
             let proxiedUrl;
             const encodedUrl = encodeURIComponent(absoluteUrl);
 
-            if (absoluteUrl.includes('.m3u') || absoluteUrl.includes('playlist')) {
+            if (PLAYLIST_REGEX.test(absoluteUrl)) {
               proxiedUrl = `${SERVER_ORIGIN}/proxy/m3u8-proxy?url=${encodedUrl}${headers ? `&headers=${encodedHeaders}` : ""}`;
             } else {
               proxiedUrl = `${SERVER_ORIGIN}/proxy/fetch?url=${encodedUrl}${headers ? `&headers=${encodedHeaders}` : ""}`;
@@ -82,7 +87,7 @@ export const proxyRoutes = new Elysia({ prefix: "/proxy" })
         const absoluteUrl = new URL(tl, url).href;
         const encodedUrl = encodeURIComponent(absoluteUrl);
 
-        if (absoluteUrl.includes('.m3u') || absoluteUrl.includes('playlist')) {
+        if (PLAYLIST_REGEX.test(absoluteUrl)) {
           return `${SERVER_ORIGIN}/proxy/m3u8-proxy?url=${encodedUrl}${headers ? `&headers=${encodedHeaders}` : ""}`;
         } else {
           return `${SERVER_ORIGIN}/proxy/ts-segment?url=${encodedUrl}${headers ? `&headers=${encodedHeaders}` : ""}`;
@@ -104,7 +109,11 @@ export const proxyRoutes = new Elysia({ prefix: "/proxy" })
     query: t.Object({
       url: t.String(),
       headers: t.Optional(t.String())
-    })
+    }),
+    detail: { 
+      tags: ['proxy'], 
+      summary: 'M3U8 Playlist Proxy' 
+    }
   })
 
   .get("/ts-segment", async ({ request, query: { url, headers } }) => {
@@ -153,7 +162,11 @@ export const proxyRoutes = new Elysia({ prefix: "/proxy" })
     query: t.Object({
       url: t.String(),
       headers: t.Optional(t.String())
-    })
+    }),
+    detail: { 
+      tags: ['proxy'], 
+      summary: 'TS Segment Proxy' 
+    }
   })
 
   .get("/mp4-proxy", async ({ request, query: { url, headers } }) => {
@@ -174,11 +187,6 @@ export const proxyRoutes = new Elysia({ prefix: "/proxy" })
     }
 
     corsHeaders["Connection"] = "keep-alive";
-
-
-    // if (download) {
-    //     corsHeaders["Content-Disposition"] = "attachment";
-    // }
 
     try {
       const res = await fetch(url, {
@@ -215,8 +223,11 @@ export const proxyRoutes = new Elysia({ prefix: "/proxy" })
     query: t.Object({
       url: t.String(),
       headers: t.Optional(t.String()),
-      // download: t.Optional(t.String())
-    })
+    }),
+    detail: { 
+      tags: ['proxy'], 
+      summary: 'MP4 Video Proxy' 
+    }
   })
 
   .get("/fetch", async ({ request, query: { url, headers } }) => {
@@ -230,7 +241,6 @@ export const proxyRoutes = new Elysia({ prefix: "/proxy" })
     }
 
     customHeaders["Connection"] = "keep-alive";
-
 
     try {
       const res = await fetch(url, {
@@ -257,5 +267,9 @@ export const proxyRoutes = new Elysia({ prefix: "/proxy" })
     query: t.Object({
       url: t.String(),
       headers: t.Optional(t.String())
-    })
-  })
+    }),
+    detail: { 
+      tags: ['proxy'], 
+      summary: 'General Media Fetch Proxy' 
+    }
+  });
