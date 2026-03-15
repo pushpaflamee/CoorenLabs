@@ -195,17 +195,23 @@ export class FlixHQ {
     if (!episodeId) return { error: "episodeId is required" };
     try {
       let servers: any[] = [];
-      const watchPath = `/watch-${episodeId.replace("-", "/")}`;
       if (episodeId.includes("movie")) {
         const id = episodeId.split("-").at(-1);
         const res = await axios.get(this.buildAjaxUrl(id!, "movie-server"), {
-          headers: { "X-Requested-With": "XMLHttpRequest", Referer: `${this.baseUrl}${watchPath}` },
+          headers: {
+            "X-Requested-With": "XMLHttpRequest",
+            Referer: `${this.baseUrl}/watch-${episodeId.replace("-", "/")}`,
+          },
         });
         servers = parser.parseServers(cheerio.load(res.data));
       } else {
-        const id = episodeId.split("-episode-").at(1);
+        const parts = episodeId.split("-episode-");
+        const id = parts.at(1);
         const res = await axios.get(this.buildAjaxUrl(id!, "tv-server"), {
-          headers: { "X-Requested-With": "XMLHttpRequest", Referer: `${this.baseUrl}${watchPath}` },
+          headers: {
+            "X-Requested-With": "XMLHttpRequest",
+            Referer: `${this.baseUrl}/watch-${parts.at(0)?.replace("-", "/")}`,
+          },
         });
         servers = parser.parseServers(cheerio.load(res.data));
       }
@@ -226,31 +232,31 @@ export class FlixHQ {
     try {
       const serversRes = await this.fetchServers(episodeId);
       if (serversRes.error) throw new Error(serversRes.error);
-      
+
       const servers = serversRes.data as any[];
-      const priorityOrder = [server, "vidcloud", "akcloud", "upcloud"];
+      const priorityOrder = [server, "vidcloud", "upcloud", "akcloud"];
       let selectedServer = null;
       for (const name of priorityOrder) {
-        selectedServer = servers.find(s => s.serverName === name);
+        selectedServer = servers.find((s) => s.serverName === name);
         if (selectedServer) break;
       }
       if (!selectedServer) throw new Error("No supported server found");
 
       let refererPath = "";
       if (episodeId.includes("movie")) {
-        refererPath = episodeId.replace("-", "/");
+        refererPath = `${this.baseUrl}/${episodeId.replace("-", "/")}`;
       } else {
-        refererPath = episodeId.split("-episode-")[0].replace("-", "/");
+        refererPath = `${this.baseUrl}/${episodeId.split("-episode-").at(0)?.replace("-", "/")}`;
       }
 
       const embedRes = await axios.get(`${this.baseUrl}/ajax/episode/sources/${selectedServer.serverId}`, {
         headers: {
           "X-Requested-With": "XMLHttpRequest",
-          Referer: `${this.baseUrl}/${refererPath}.${selectedServer.serverId}`,
+          Referer: `${refererPath}.${selectedServer.serverId}`,
         },
       });
       if (!embedRes.data?.link) throw new Error("Failed to get embed link");
-      
+
       return await this.fetchSources(embedRes.data.link, server);
     } catch (error: any) {
       return { error: error.message };
