@@ -546,7 +546,7 @@ export const toonstreamRoutes = new Elysia({ prefix: "/toonstream" })
       if (headers) {
         try {
           customHeaders = JSON.parse(decodeURIComponent(headers));
-        } catch (e) {
+        } catch (_e) {
           console.error("Fetch header parse failed");
         }
       }

@@ -6,10 +6,9 @@ import { env, isBun } from "./runtime";
 import { Logger } from "./logger";
 
 // We can't import RedisClient from "bun" in non-Bun runtimes.
-let RedisClientValue: any;
+let _RedisClientValue: any;
 if (isBun) {
-  
-  import("bun").then((m) => (RedisClientValue = m.RedisClient));
+  import("bun").then((m) => (_RedisClientValue = m.RedisClient));
 }
 
 const cacheProviders = ["default", "uptash"];
@@ -51,7 +50,7 @@ else if (CACHE_PROVIDER == "default") {
 
     // Use dynamic import or handle via variable
     // Since we already checked isBun, we can assume it's available.
-    
+
     import("bun")
       .then(({ RedisClient }) => {
         redis = new RedisClient(REDIS_URL, {

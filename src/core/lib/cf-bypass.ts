@@ -96,7 +96,7 @@ export async function getCloudflareClearance(targetUrl: string): Promise<Clearan
             let userAgent = "";
             try {
               userAgent = await pageInstance.evaluate((): string => navigator.userAgent);
-            } catch (err) {
+            } catch (_err) {
               return;
             }
 
@@ -117,7 +117,7 @@ export async function getCloudflareClearance(targetUrl: string): Promise<Clearan
               ttl: ttlSeconds,
             });
           }
-        } catch (err) {
+        } catch (_err) {
           // Suppress rapid-reload context errors
         }
       }, 50);

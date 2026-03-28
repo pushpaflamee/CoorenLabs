@@ -257,7 +257,7 @@ export class AnimeSalt {
             quality: source.label || "auto",
             type: source.type || "hls",
           };
-        } catch {}
+        } catch (_err) {}
       }
     } catch (err) {
       Logger.error(err);
@@ -324,7 +324,7 @@ export class AnimeSalt {
         if (iframe) {
           results.push(iframe.startsWith("//") ? "https:" + iframe : iframe);
         }
-      } catch {}
+      } catch (_err) {}
     }
 
     return results;

@@ -3,9 +3,9 @@ import { env, isBun } from "../../../../core/runtime";
 const redisUrl = env.REDIS_URL || undefined;
 const cacheEnabled = env.ENABLE_CACHE && env.ENABLE_CACHE == "true";
 
-let RedisClientValue: any;
+let _RedisClientValue: any;
 if (isBun) {
-  import("bun").then((m) => (RedisClientValue = m.RedisClient));
+  import("bun").then((m) => (_RedisClientValue = m.RedisClient));
 }
 
 let redis: any | null = null;
@@ -116,7 +116,7 @@ export class Cache {
   }
 
   static async del(key: string) {
-    const fullKey = PREFIX + key;
+    const _fullKey = PREFIX + key;
     try {
       console.log(`[Cache] deleting cache key: ${key}`);
       return await redis.del(key);

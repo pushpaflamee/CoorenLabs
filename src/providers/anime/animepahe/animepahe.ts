@@ -1,5 +1,4 @@
 import * as cheerio from "cheerio";
-import { compareTwoStrings } from "string-similarity";
 import { Logger } from "../../../core/logger";
 import {
   DDOS_GUARD_HEADERS,
@@ -460,7 +459,7 @@ export class Animepahe {
       }
 
       return urlObj.toString();
-    } catch (e) {
+    } catch (_e) {
       // Fallback for simple replacement if URL object fails
       return m3u8Url
         .replace(".uwucdn.top", ".kwik.cx")

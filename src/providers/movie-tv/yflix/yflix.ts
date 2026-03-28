@@ -26,7 +26,7 @@ export class yFlix {
     const data = await fetcher(url, true, "yflix");
 
     if (data && data.success) {
-      const { success, status, text } = data;
+      const { success: _success, status: _status, text } = data;
 
       const searchResults = extractSearchData(text);
       // console.log(searchResults);

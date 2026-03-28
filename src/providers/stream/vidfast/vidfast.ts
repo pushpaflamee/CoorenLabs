@@ -61,7 +61,7 @@ export class VidfastParser {
         url: sub.url,
         format: sub.format || "srt",
       }));
-    } catch (err) {
+    } catch (_err) {
       return [];
     }
   }
@@ -77,7 +77,7 @@ export class VidfastParser {
         return data.meta.imdb_id;
       }
       return null;
-    } catch (e) {
+    } catch (_e) {
       return null;
     }
   }
@@ -192,7 +192,7 @@ export class VidfastParser {
                   `[Vidfast] Intercepted Server List: ${expectedServerCount} servers available.`,
                 );
               }
-            } catch (e) {}
+            } catch (_e) {}
           }
         });
 
@@ -304,7 +304,7 @@ export class VidfastParser {
                 }
               }, serverList)
               .catch(() => {});
-          } catch (e) {}
+          } catch (_e) {}
         }, 1500);
       });
 
@@ -352,7 +352,7 @@ export class VidfastParser {
     });
 
     const cleanedSources = payload.sources.map((s: any) => {
-      const { originalUrl, ...rest } = s;
+      const { originalUrl: _originalUrl, ...rest } = s;
       return rest;
     });
 

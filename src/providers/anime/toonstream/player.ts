@@ -10,7 +10,7 @@ let subtitle: {
   url: string;
 } | null = null;
 
-export async function moviePlayer(slug: string) {
+export async function moviePlayer(_slug: string) {
   const res = await ScrapeMovieSources(slug);
 
   const sources = res?.sources || [];
@@ -43,7 +43,7 @@ export async function moviePlayer(slug: string) {
   return makeHtml("Movie", slug);
 }
 
-export async function episodePlayer(slug: string) {
+export async function episodePlayer(_slug: string) {
   const res = await ScrapeEpisodeSources(slug);
 
   const sources = res?.sources || [];
@@ -75,7 +75,7 @@ export async function episodePlayer(slug: string) {
 
   return makeHtml("Episode", slug);
 }
-function makeHtml(type: string, slug: string) {
+function makeHtml(_type: string, _slug: string) {
   return new Response(
     `
 <!doctype html>

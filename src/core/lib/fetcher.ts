@@ -63,8 +63,13 @@ export const fetcher = async (
         for (let i = 1; i <= CF_BYPASS_MAX_TRY; ++i) {
           Logger.info(`[${cachePrefix}] Bypassing CF Capcha - Try ${i}/${CF_BYPASS_MAX_TRY}`);
 
-          const { success, allCookies, cfClearance, userAgent, ttl } =
-            await getCloudflareClearance(input);
+          const {
+            success,
+            allCookies: _allCookies,
+            cfClearance,
+            userAgent,
+            ttl,
+          } = await getCloudflareClearance(input);
 
           if (success) {
             Logger.success(`[${cachePrefix}] Successfully bypassed CF capcha`);

@@ -7,7 +7,7 @@ export const MANGABALL_CDN_HOSTS = [
   "https://heracross.red-and-blue.net",
 ];
 
-const MANGABALL_CHAPTER_ORIGINS = [
+const _MANGABALL_CHAPTER_ORIGINS = [
   "https://mangaball.net",
   "https://bulbasaur.poke-black-and-white.net",
   "https://heracross.red-and-blue.net",

@@ -1,5 +1,4 @@
 import * as cheerio from "cheerio";
-import { compareTwoStrings } from "string-similarity";
 import { Logger } from "../../../core/logger";
 import { animekai as animekaiOrigin } from "../../origins";
 import { USER_AGENT } from "../animepahe/scraper";
@@ -602,7 +601,7 @@ export class AnimeKai {
 
   // ─── Resolve / Mapping Helpers ───────────────────────────────────────────────
 
-  static async resolveByExternalId(params: {
+  static async resolveByExternalId(_params: {
     mal_id?: number;
     anilist_id?: number;
   }): Promise<string | null> {

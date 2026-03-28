@@ -121,7 +121,7 @@ export class VidCloud {
       try {
         clientKey = await getClientKey(videoUrl.href, referer);
         if (clientKey) break;
-      } catch (e) {
+      } catch (_e) {
         await new Promise((r) => setTimeout(r, Math.pow(2, attempt) * 1000));
       }
     }
