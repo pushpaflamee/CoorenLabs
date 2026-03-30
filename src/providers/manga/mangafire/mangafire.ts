@@ -12,7 +12,8 @@ export class MangaFireParser {
       baseURL: BASE_URL,
       timeout: 15_000,
       headers: {
-        Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
         "User-Agent":
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36",
         Referer: `${BASE_URL}/`,
@@ -248,7 +249,11 @@ export class MangaFireParser {
           name: $(el).find(".info .above a")?.text()?.trim() || null,
           description: $(el).find(".info .below span")?.text()?.trim() || null,
           currentChapter: $(el).find(".info .below p")?.text()?.trim() || null,
-          genres: $(el).find(".info .below div a")?.map((_, g) => $(g).text().trim()).get() || [],
+          genres:
+            $(el)
+              .find(".info .below div a")
+              ?.map((_, g) => $(g).text().trim())
+              .get() || [],
           poster: $(el).find(".swiper-inner a div img")?.attr("src")?.trim() || null,
         });
       });
@@ -282,13 +287,15 @@ export class MangaFireParser {
 
       $(".tab-content[data-name='all'] .unit").each((_, el) => {
         const chapters: any[] = [];
-        $(el).find(".info .content[data-name='chap'] li").each((_, cEl) => {
-          chapters.push({
-            id: $(cEl).find("a")?.attr("href")?.replace("/read/", "") || null,
-            chapterName: $(cEl).find("a span").first().text().trim(),
-            releaseTime: $(cEl).find("a span").last().text().trim(),
+        $(el)
+          .find(".info .content[data-name='chap'] li")
+          .each((_, cEl) => {
+            chapters.push({
+              id: $(cEl).find("a")?.attr("href")?.replace("/read/", "") || null,
+              chapterName: $(cEl).find("a span").first().text().trim(),
+              releaseTime: $(cEl).find("a span").last().text().trim(),
+            });
           });
-        });
 
         res.recentlyUpdatedManga.push({
           id: $(el).find(".inner > a")?.attr("href")?.replace("/manga/", "") || null,
@@ -332,14 +339,16 @@ export class MangaFireParser {
 
       $("div.original.card-lg > div.unit").each((_, el) => {
         const chapters: any[] = [];
-        $(el).find('ul.content[data-name="chap"] > li').each((_, chapEl) => {
-          chapters.push({
-            url: $(chapEl).find("a").attr("href") || null,
-            title: $(chapEl).find("a").attr("title") || null,
-            chapter: $(chapEl).find("a > span:first-child").text().trim() || null,
-            releaseDate: $(chapEl).find("a > span:last-child").text().trim() || null,
+        $(el)
+          .find('ul.content[data-name="chap"] > li')
+          .each((_, chapEl) => {
+            chapters.push({
+              url: $(chapEl).find("a").attr("href") || null,
+              title: $(chapEl).find("a").attr("title") || null,
+              chapter: $(chapEl).find("a > span:first-child").text().trim() || null,
+              releaseDate: $(chapEl).find("a > span:last-child").text().trim() || null,
+            });
           });
-        });
 
         results.push({
           id: $(el).find("a.poster").attr("href")?.replace("/manga/", "") || null,
@@ -380,14 +389,16 @@ export class MangaFireParser {
 
       $("div.original.card-lg > div.unit").each((_, el) => {
         const chapters: any[] = [];
-        $(el).find('ul.content[data-name="chap"] > li').each((_, chapEl) => {
-          chapters.push({
-            url: $(chapEl).find("a").attr("href") || null,
-            title: $(chapEl).find("a").attr("title") || null,
-            chapter: $(chapEl).find("a > span:first-child").text().trim() || null,
-            releaseDate: $(chapEl).find("a > span:last-child").text().trim() || null,
+        $(el)
+          .find('ul.content[data-name="chap"] > li')
+          .each((_, chapEl) => {
+            chapters.push({
+              url: $(chapEl).find("a").attr("href") || null,
+              title: $(chapEl).find("a").attr("title") || null,
+              chapter: $(chapEl).find("a > span:first-child").text().trim() || null,
+              releaseDate: $(chapEl).find("a > span:last-child").text().trim() || null,
+            });
           });
-        });
 
         results.push({
           id: $(el).find("a.poster").attr("href")?.replace("/manga/", "") || null,
@@ -429,14 +440,16 @@ export class MangaFireParser {
 
       $("div.original.card-lg > div.unit").each((_, el) => {
         const chapters: any[] = [];
-        $(el).find('ul.content[data-name="chap"] > li').each((_, chapEl) => {
-          chapters.push({
-            url: $(chapEl).find("a").attr("href") || null,
-            title: $(chapEl).find("a").attr("title") || null,
-            chapter: $(chapEl).find("a > span:first-child").text().trim() || null,
-            releaseDate: $(chapEl).find("a > span:last-child").text().trim() || null,
+        $(el)
+          .find('ul.content[data-name="chap"] > li')
+          .each((_, chapEl) => {
+            chapters.push({
+              url: $(chapEl).find("a").attr("href") || null,
+              title: $(chapEl).find("a").attr("title") || null,
+              chapter: $(chapEl).find("a > span:first-child").text().trim() || null,
+              releaseDate: $(chapEl).find("a > span:last-child").text().trim() || null,
+            });
           });
-        });
 
         results.push({
           id: $(el).find("a.poster").attr("href")?.replace("/manga/", "") || null,

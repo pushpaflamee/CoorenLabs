@@ -13,13 +13,7 @@ const CONST = {
     "/4GPpmZXYpn5RpkP7FC/dt8SXz7W30nUZTe8wb+3xmU=",
     "wsSGSBXKWA9q1oDJpjtJddVxH+evCfL5SO9HZnUDFU8=",
   ],
-  prefixKeys: [
-    "l9PavRg=",
-    "Ml2v7ag1Jg==",
-    "i/Va0UxrbMo=",
-    "WFjKAHGEkQM=",
-    "5Rr27rWd",
-  ],
+  prefixKeys: ["l9PavRg=", "Ml2v7ag1Jg==", "i/Va0UxrbMo=", "WFjKAHGEkQM=", "5Rr27rWd"],
 };
 
 const toBytes = (str: string): number[] => Array.from(str, (c) => c.charCodeAt(0) & 0xff);
